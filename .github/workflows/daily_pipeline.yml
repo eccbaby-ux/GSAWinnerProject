@@ -59,6 +59,7 @@ jobs:
       - name: Run Pipeline (משיכת תחזיות להיום)
         env:
           FOOTBALL_API_KEY: ${{ secrets.FOOTBALL_API_KEY }}
+          PLAYWRIGHT_HEADLESS: 'true'
         run: |
           echo "=== Run_GSA: שלב 1 - שליפת מכרז Winner ==="
           python -Xutf8 winner_auto_fetcher.py
