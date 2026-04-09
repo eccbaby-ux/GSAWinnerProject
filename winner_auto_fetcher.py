@@ -420,10 +420,9 @@ def get_winner_data():
                         match_entry["winner_time"] = ""
                     break
 
-    is_ci = os.environ.get("PLAYWRIGHT_HEADLESS", "false").lower() == "true"
     with sync_playwright() as p:
         browser = p.chromium.launch(
-            headless=is_ci,
+            headless=False,
             args=[
                 "--disable-blink-features=AutomationControlled",
                 "--disable-dev-shm-usage",

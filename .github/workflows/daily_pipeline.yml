@@ -59,10 +59,9 @@ jobs:
       - name: Run Pipeline (משיכת תחזיות להיום)
         env:
           FOOTBALL_API_KEY: ${{ secrets.FOOTBALL_API_KEY }}
-          PLAYWRIGHT_HEADLESS: 'true'
         run: |
           echo "=== Run_GSA: שלב 1 - שליפת מכרז Winner ==="
-          python -Xutf8 winner_auto_fetcher.py
+          xvfb-run --auto-servernum python -Xutf8 winner_auto_fetcher.py
 
           echo "=== Run_GSA: שלב 2 - מנוע ניתוח ==="
           python -Xutf8 v76_Master_Nachshon.py

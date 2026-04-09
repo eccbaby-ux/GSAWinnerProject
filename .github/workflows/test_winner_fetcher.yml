@@ -32,6 +32,4 @@ jobs:
           python -m playwright install chromium
 
       - name: Run winner_auto_fetcher.py
-        env:
-          PLAYWRIGHT_HEADLESS: 'true'
-        run: python -Xutf8 winner_auto_fetcher.py
+        run: xvfb-run --auto-servernum python -Xutf8 winner_auto_fetcher.py
