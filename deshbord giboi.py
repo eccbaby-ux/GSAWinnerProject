@@ -90,10 +90,7 @@ st.markdown("""
             font-size: 0.78rem !important;
             padding: 5px 6px !important;
         }
-        /* סרגל צד */
-        section[data-testid="stSidebar"] {
-            width: 85vw !important;
-        }
+        /* סרגל צד — Streamlit מטפל בזה אוטומטית במובייל */
     }
 </style>
 """, unsafe_allow_html=True)
@@ -1681,11 +1678,6 @@ bg_css = f"""
 
         /* expanders */
         [data-testid="stExpander"] {{ font-size: 0.88rem !important; }}
-
-        /* סרגל צד */
-        [data-testid="stSidebar"] > div:first-child {{
-            padding: 0.5rem !important;
-        }}
 
         /* tabs */
         [data-testid="stTabs"] button {{ font-size: 0.82rem !important; padding: 6px 8px !important; }}
