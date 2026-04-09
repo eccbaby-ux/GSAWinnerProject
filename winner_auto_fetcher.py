@@ -419,15 +419,38 @@ def get_winner_data():
 
     is_ci = os.environ.get("PLAYWRIGHT_HEADLESS", "false").lower() == "true"
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=is_ci, args=["--disable-blink-features=AutomationControlled"])
-        context = browser.new_context(viewport={"width": 1920, "height": 1080})
+        browser = p.chromium.launch(
+            headless=is_ci,
+            args=[
+                "--disable-blink-features=AutomationControlled",
+                "--disable-dev-shm-usage",
+                "--no-sandbox",
+                "--disable-setuid-sandbox",
+            ]
+        )
+        context = browser.new_context(
+            viewport={"width": 1920, "height": 1080},
+            user_agent=(
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                "AppleWebKit/537.36 (KHTML, like Gecko) "
+                "Chrome/124.0.0.0 Safari/537.36"
+            ),
+            locale="he-IL",
+            timezone_id="Asia/Jerusalem",
+        )
+        # הסתרת סימני אוטומציה לפני טעינת הדף
+        context.add_init_script("""
+            Object.defineProperty(navigator, 'webdriver', {get: () => undefined});
+            Object.defineProperty(navigator, 'plugins', {get: () => [1,2,3]});
+            Object.defineProperty(navigator, 'languages', {get: () => ['he-IL','he','en-US']});
+        """)
         page = context.new_page()
         page.on("response", handle_response)
-        
+
         try:
             print("   ⏳ פותח את אתר הווינר, מאזין לרשת וגולל...")
             page.goto("https://www.winner.co.il/", wait_until="domcontentloaded", timeout=40000)
-            page.wait_for_timeout(2000)  # המתנה לטעינת API ראשוני
+            page.wait_for_timeout(3000)  # המתנה לטעינת API ראשוני
 
             # גלילה מרובה – האתר טוען ליגות/משחקים בהדרגה (lazy loading)
             for i in range(10):
