@@ -6,7 +6,7 @@ from scipy.stats import poisson as scipy_poisson
 from datetime import datetime
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-FOOTBALL_API_KEY = "e49cdc2ba079c654d1dbc88fb16bfa75"
+FOOTBALL_API_KEY = os.environ.get("FOOTBALL_API_KEY", "e49cdc2ba079c654d1dbc88fb16bfa75")
 
 try:
     from calibration_layer import load_calibration_params, apply_calibration

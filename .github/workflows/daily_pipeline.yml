@@ -28,6 +28,8 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Train Pipeline (למידה מתוצאות אתמול)
+        env:
+          FOOTBALL_API_KEY: ${{ secrets.FOOTBALL_API_KEY }}
         run: |
           echo "=== Train_GSA: שלב 1 - עדכון תוצאות ==="
           python -Xutf8 result_updater.py
@@ -45,6 +47,8 @@ jobs:
           python -Xutf8 ticha_system.py
 
       - name: Run Pipeline (משיכת תחזיות להיום)
+        env:
+          FOOTBALL_API_KEY: ${{ secrets.FOOTBALL_API_KEY }}
         run: |
           echo "=== Run_GSA: שלב 1 - שליפת מכרז Winner ==="
           python -Xutf8 winner_auto_fetcher.py

@@ -4,3 +4,4 @@ __pycache__/
 .env
 *.log
 GSA_System_Complete_Guide.html
+.claude/

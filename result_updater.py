@@ -12,7 +12,7 @@ import sys
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(BASE_DIR, "gsa_history.db")
-FOOTBALL_API_KEY = "e49cdc2ba079c654d1dbc88fb16bfa75"
+FOOTBALL_API_KEY = os.environ.get("FOOTBALL_API_KEY", "e49cdc2ba079c654d1dbc88fb16bfa75")
 BASE_URL = "https://v3.football.api-sports.io/fixtures"
 HEADERS = {"x-apisports-key": FOOTBALL_API_KEY}
 
