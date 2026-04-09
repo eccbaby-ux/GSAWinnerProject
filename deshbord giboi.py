@@ -38,7 +38,6 @@ MIN_ODDS = 1.50                  # אל תיגע ביחסים נמוכים מ-1.
 
 st.set_page_config(page_title="GSA V76 Pro", layout="wide", page_icon="⚽")
 
-# CSS לשיפור תצוגת פלט מסוף – רחב וקריא (לא צר כמו בסרגל צד)
 st.markdown("""
 <style>
     /* פלט מסוף – שימוש ברוחב מלא, טקסט לא נחתך */
@@ -47,6 +46,45 @@ st.markdown("""
         word-wrap: break-word !important;
         max-width: 100% !important;
         overflow-x: auto !important;
+    }
+
+    /* --- Mobile Responsive --- */
+    @media (max-width: 768px) {
+        /* עמודות מתקפלות לשורות נפרדות */
+        [data-testid="column"] {
+            width: 100% !important;
+            flex: 1 1 100% !important;
+            min-width: 100% !important;
+        }
+        /* מדדים (metrics) בגופן קריא */
+        [data-testid="stMetric"] {
+            font-size: 0.9rem !important;
+        }
+        /* טקסט כותרות */
+        h1 { font-size: 1.4rem !important; }
+        h2 { font-size: 1.2rem !important; }
+        h3 { font-size: 1.0rem !important; }
+        /* טבלאות גלילה אופקית */
+        [data-testid="stDataFrame"], .stTable {
+            overflow-x: auto !important;
+            display: block !important;
+        }
+        /* כפתורים בגודל נוח לאצבע */
+        .stButton > button {
+            width: 100% !important;
+            min-height: 2.5rem !important;
+            font-size: 1rem !important;
+        }
+        /* סרגל צד — רוחב מלא במובייל */
+        section[data-testid="stSidebar"] {
+            width: 85vw !important;
+            min-width: 0 !important;
+        }
+        /* ריווח מופחת */
+        .block-container {
+            padding-left: 0.75rem !important;
+            padding-right: 0.75rem !important;
+        }
     }
 </style>
 """, unsafe_allow_html=True)
@@ -1585,12 +1623,63 @@ bg_css = f"""
 
     /* ===== מובייל (עד 768px) ===== */
     @media (max-width: 768px) {{
-        .main .block-container {{ padding: 0.5rem; }}
-        h1 {{ font-size: 1.3rem !important; }}
-        h2 {{ font-size: 1.1rem !important; }}
-        .match-card {{ padding: 12px; }}
-        .metric-container {{ padding: 10px 6px; }}
-        .metric-container b {{ font-size: 1.3rem !important; }}
+        /* ריווח */
+        .main .block-container {{ padding: 0.4rem 0.4rem 2rem 0.4rem !important; }}
+
+        /* כותרות */
+        h1 {{ font-size: 1.2rem !important; }}
+        h2 {{ font-size: 1.0rem !important; }}
+        h3 {{ font-size: 0.9rem !important; }}
+
+        /* עמודות Streamlit — מחסן לגובה (מלא 100%) */
+        [data-testid="column"] {{
+            width: 100% !important;
+            flex: 1 1 100% !important;
+            min-width: 100% !important;
+        }}
+
+        /* כרטיסי משחק */
+        .match-card {{ padding: 10px; margin-bottom: 12px; }}
+
+        /* כרטיסי כספים — גריד 2 עמודות */
+        .finance-card {{
+            padding: 10px 8px;
+            margin-bottom: 6px;
+        }}
+        .finance-card .card-title {{ font-size: 0.78rem !important; }}
+        .finance-card .card-value {{ font-size: 1.15rem !important; }}
+
+        /* מדדים */
+        .metric-container {{ padding: 8px 4px; margin-bottom: 6px; }}
+        .metric-container small {{ font-size: 0.75rem !important; }}
+        .metric-container b {{ font-size: 1.1rem !important; }}
+
+        /* כפתורים */
+        .stButton > button {{
+            width: 100% !important;
+            min-height: 2.8rem !important;
+            font-size: 0.95rem !important;
+            margin-bottom: 4px !important;
+        }}
+
+        /* שמות קבוצות בכרטיסי משחק */
+        .match-card h2 {{ font-size: 0.95rem !important; }}
+
+        /* dataframe — גלילה אופקית */
+        [data-testid="stDataFrame"] > div {{
+            overflow-x: auto !important;
+        }}
+
+        /* expanders */
+        [data-testid="stExpander"] {{ font-size: 0.88rem !important; }}
+
+        /* סרגל צד */
+        [data-testid="stSidebar"] > div:first-child {{
+            padding: 0.5rem !important;
+        }}
+
+        /* tabs */
+        [data-testid="stTabs"] button {{ font-size: 0.82rem !important; padding: 6px 8px !important; }}
     }}
 </style>
 """
