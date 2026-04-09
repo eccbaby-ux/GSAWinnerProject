@@ -418,7 +418,7 @@ def get_winner_data():
                     break
 
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=False, args=["--disable-blink-features=AutomationControlled"])
+        browser = p.chromium.launch(headless=True, args=["--disable-blink-features=AutomationControlled"])
         context = browser.new_context(viewport={"width": 1920, "height": 1080})
         page = context.new_page()
         page.on("response", handle_response)
