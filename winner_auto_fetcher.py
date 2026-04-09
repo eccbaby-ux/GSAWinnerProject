@@ -21,13 +21,16 @@ def get_winner_data():
             print(f"   ⚠️ לא הצלחתי לשמור יחסים קודמים: {e}")
     extracted_matches = {}
     
+    _debug_responses = []
+
     def handle_response(response):
         if response.request.resource_type in ["fetch", "xhr", "document"]:
             try:
                 data = response.json()
+                _debug_responses.append(f"[JSON] {response.url[:120]}")
                 _parse_and_store(data, extracted_matches)
             except:
-                pass
+                _debug_responses.append(f"[non-JSON] {response.url[:120]}")
 
     def _parse_and_store(data_node, matches_dict):
         # מנגנון ניקוי – מוגדר ראשון כי משמש בסריקות
@@ -479,6 +482,9 @@ def get_winner_data():
     extracted_matches = {k: v for k, v in extracted_matches.items() if _has_valid_x_odd(v)}
 
     if not extracted_matches:
+        print(f"   [DEBUG] סה\"כ responses שהתקבלו: {len(_debug_responses)}")
+        for r in _debug_responses[:30]:
+            print(f"   {r}")
         print("❌ לא נמצאו משחקים.")
         return
 
