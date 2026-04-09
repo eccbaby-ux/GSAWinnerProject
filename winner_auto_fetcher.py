@@ -417,7 +417,7 @@ def get_winner_data():
                         match_entry["winner_time"] = ""
                     break
 
-    is_ci = os.environ.get("CI", "").lower() in ("true", "1")
+    is_ci = os.environ.get("GITHUB_ACTIONS", "").lower() == "true"
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=is_ci, args=["--disable-blink-features=AutomationControlled"])
         context = browser.new_context(viewport={"width": 1920, "height": 1080})
