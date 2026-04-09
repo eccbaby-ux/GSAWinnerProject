@@ -1,10 +1,7 @@
 name: Daily GSA Pipeline
 
 on:
-  schedule:
-    # רץ כל יום ב-06:00 UTC = 09:00 שעון ישראל (קיץ) / 08:00 חורף
-    - cron: '0 6 * * *'
-  workflow_dispatch:  # אפשרות להפעיל ידנית מה-GitHub
+  workflow_dispatch:  # הפעלה ידנית בלבד מה-GitHub (הפייפליין היומי רץ מקומית)
 
 jobs:
   run-pipeline:

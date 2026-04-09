@@ -3001,19 +3001,11 @@ st.markdown(
     unsafe_allow_html=True,
 )
 st.markdown(
-    "<div style='text-align:right; padding:14px 18px; margin:12px 0 18px 0; "
-    "background:linear-gradient(135deg,#ecfdf5 0%,#eff6ff 100%); border-radius:10px; "
-    "border-right:4px solid #059669; font-size:0.92rem; color:#1e293b; line-height:1.55;'>"
-    "<b style='color:#047857;'>⏱️ שעות מומלצות להרצה</b> "
-    "<span style='color:#64748b; font-size:0.82rem;'>(לפי שעון המחשב המקומי; "
-    "משחק נחשב 90 דק׳, ללימוד מוסיפים 30 דק׳ אחרי סיום עד עדכון תוצאות באתרים; "
-    "Run_GSA ~שעה, Train_GSA ~חצי שעה; "
-    "<b>אין להריץ את שני הסקריפטים במקביל</b> — שעת Train מחושבת אחרי חלון ה-Run)</span><br><br>"
-    f"<span style='color:#0f766e;'>🚀 <b>Run_GSA.bat</b></span> — משיכת משחקים חדשים: "
-    f"{_maint_rec['run_detail']}<br>"
-    f"<span style='color:#1d4ed8;'>🧠 <b>Train_GSA.bat</b></span> — למידה וכיול: "
-    f"{_maint_rec['train_detail']}"
-    "</div>",
+    f"<div style='text-align:right; padding:10px 16px; margin:8px 0 16px 0; "
+    f"background:#f0fdf4; border-radius:8px; border-right:4px solid #16a34a; "
+    f"font-size:0.9rem; color:#166534;'>"
+    f"✅ <b>הרצה אחרונה של Daily_Full_Pipeline.bat:</b> {ts_str}"
+    f"</div>",
     unsafe_allow_html=True,
 )
 
