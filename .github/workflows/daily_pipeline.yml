@@ -1,0 +1,66 @@
+name: Daily GSA Pipeline
+
+on:
+  schedule:
+    # רץ כל יום ב-06:00 UTC = 09:00 שעון ישראל (קיץ) / 08:00 חורף
+    - cron: '0 6 * * *'
+  workflow_dispatch:  # אפשרות להפעיל ידנית מה-GitHub
+
+jobs:
+  run-pipeline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Train Pipeline (למידה מתוצאות אתמול)
+        run: |
+          echo "=== Train_GSA: שלב 1 - עדכון תוצאות ==="
+          python -Xutf8 result_updater.py
+
+          echo "=== Train_GSA: שלב 2 - עדכון ELO ==="
+          python -Xutf8 elo_updater.py || echo "ELO failed - continuing"
+
+          echo "=== Train_GSA: שלב 3 - Auto Learner ==="
+          python -Xutf8 v79_Auto_Learner.py
+
+          echo "=== Train_GSA: שלב 4 - Shishka ==="
+          python -Xutf8 shishka_run_and_save.py
+
+          echo "=== Train_GSA: שלב 5 - Ticha ==="
+          python -Xutf8 ticha_system.py
+
+      - name: Run Pipeline (משיכת תחזיות להיום)
+        run: |
+          echo "=== Run_GSA: שלב 1 - שליפת מכרז Winner ==="
+          python -Xutf8 winner_auto_fetcher.py
+
+          echo "=== Run_GSA: שלב 2 - מנוע ניתוח ==="
+          python -Xutf8 v76_Master_Nachshon.py
+
+          echo "=== Run_GSA: שלב 3 - סינון סיכונים ==="
+          python -Xutf8 dadima_correction.py
+
+      - name: Save results back to repository
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add gsa_history.db analysis_results_v76.json winner_odds_cache.json \
+                  winner_odds_previous.json ticha_params.json calibration_params.json \
+                  translation_cache.json matches.txt || true
+          git diff --cached --quiet || git commit -m "auto: daily pipeline $(date -u '+%Y-%m-%d %H:%M UTC')"
+          git push

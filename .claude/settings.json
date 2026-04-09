@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -Xutf8 -c \":*)",
+      "Bash(python -Xutf8 ticha_system.py)",
+      "Read(//c/Users/Shay/.claude/projects/c--TOTO-WinnerProject-WinnerProject/memory 2>/dev/**)",
+      "Read(//c/Users/Shay/.claude/projects/c--TOTO-WinnerProject-WinnerProject/**)",
+      "Bash(python -Xutf8 elo_updater.py)",
+      "Bash(sqlite3 /c/TOTO/WinnerProject/WinnerProject/gsa_history.db \".schema\")",
+      "Bash(sqlite3 /c/TOTO/WinnerProject/WinnerProject/gsa_history.db \".tables\")",
+      "Bash(grep -r \"CREATE TABLE\" /c/TOTO/WinnerProject/WinnerProject/*.py)",
+      "Bash(wc -l /c/TOTO/WinnerProject/WinnerProject/*.py)"
+    ]
+  }
+}

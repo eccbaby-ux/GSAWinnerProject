@@ -1,0 +1,10 @@
+# GSA Master Pro - Phase 2 (no LLM)
+requests>=2.28
+numpy>=1.20
+pandas>=1.3
+scipy>=1.7
+streamlit>=1.20
+python-dateutil>=2.8
+plotly>=5.0
+rapidfuzz>=3.0
+scikit-learn>=1.0

@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+*.pyo
+.env
+*.log
+GSA_System_Complete_Guide.html
