@@ -36,7 +36,7 @@ MAX_BETS_PER_DAY = 4             # לא יותר מ-4 הימורים ביום
 MIN_EV_THRESHOLD = 0.04          # סף EV מינימלי 4%
 MIN_ODDS = 1.50                  # אל תיגע ביחסים נמוכים מ-1.50
 
-st.set_page_config(page_title="GSA V76 Pro", layout="wide", page_icon="⚽")
+st.set_page_config(page_title="GSA V76 Pro", layout="wide", page_icon="⚽", initial_sidebar_state="collapsed")
 
 st.markdown("""
 <style>
@@ -90,7 +90,6 @@ st.markdown("""
             font-size: 0.78rem !important;
             padding: 5px 6px !important;
         }
-        /* סרגל צד — Streamlit מטפל בזה אוטומטית במובייל */
     }
 </style>
 """, unsafe_allow_html=True)
@@ -2973,65 +2972,7 @@ if os.path.exists(JSON_FILE):
 matches = sorted(matches, key=_match_sort_key)
 _maint_rec = compute_maintenance_recommendations(matches)
 
-# פלט BAT יוצג באזור הראשי (רחב) - לא בסרגל הצד הצר
-bat_output_placeholder = st.empty()
-
-# === סרגל צד ===
-st.sidebar.title("⚽ נחשון GSA")
-
 current_bankroll = get_bankroll_balance()
-st.sidebar.metric("💰 קופה ראשית (₪)", f"{current_bankroll:,.0f}")
-
-if st.sidebar.button("🔁 אפס קופה ל-₪1,000", help="מאפס את יתרת הקופה ל-1,000 ₪"):
-    set_bankroll_balance(1000.0)
-    st.rerun()
-
-if breaker_state["triggered"]:
-    with st.sidebar.expander("🚨 בלם חירום פעיל היום", expanded=True):
-        st.error("המערכת זיהתה יום בעייתי והפעילה בלם חירום:")
-        for r in breaker_state["reasons"]:
-            st.markdown(f"- {r}")
-        st.markdown("לא יופקו המלצות הימור חדשות ביום זה.")
-
-# --- מרכז שליטה (כפתורי BAT) - בחלק העליון לסיכות גישה ---
-st.sidebar.markdown("---")
-st.sidebar.markdown("### 🎛️ מרכז שליטה")
-st.sidebar.markdown(
-    "<div style='background:linear-gradient(135deg,#1e3a8a 0%,#3b82f6 100%); "
-    "padding:12px; border-radius:10px; margin-bottom:12px; color:white; font-size:0.9rem;'>"
-    "הפעלת ציד יומי או למידה וכיול</div>",
-    unsafe_allow_html=True,
-)
-st.sidebar.caption(f"🕐 {_maint_rec['run_caption']}")
-if st.sidebar.button("🚀 הרץ ציד יומי (Run_GSA)", key="btn_run_gsa", help="Run_GSA.bat", use_container_width=True):
-    with st.spinner("מריץ Run_GSA.bat..."):
-        with bat_output_placeholder.container():
-            with st.expander("📋 פלט מסוף (אזור רחב)", expanded=True):
-                output_block = st.empty()
-                ok, output = run_bat_and_capture_output(RUN_GSA_BAT, output_block)
-                output_block.code(output, language="text")
-    if ok:
-        st.success("הציד היומי הושלם בהצלחה!")
-        time.sleep(1)
-        st.rerun()
-    else:
-        st.error("הציד היומי נכשל. בדוק את הפלט למעלה.")
-st.sidebar.caption(f"🕐 {_maint_rec['train_caption']}")
-if st.sidebar.button("🧠 הרץ למידה וכיול (Train_GSA)", key="btn_train_gsa", help="Train_GSA.bat", use_container_width=True):
-    with st.spinner("מריץ Train_GSA.bat..."):
-        with bat_output_placeholder.container():
-            with st.expander("📋 פלט מסוף (אזור רחב)", expanded=True):
-                output_block = st.empty()
-                ok, output = run_bat_and_capture_output(TRAIN_GSA_BAT, output_block)
-                output_block.code(output, language="text")
-    if ok:
-        st.success("למידה וכיול הושלמו בהצלחה!")
-        time.sleep(1)
-        st.rerun()
-    else:
-        st.error("למידה וכיול נכשלו. בדוק את הפלט למעלה.")
-
-st.sidebar.markdown("---")
 
 user_bankroll = current_bankroll
 num_doubles = 6  # ברירת מחדל קבועה
@@ -3047,130 +2988,6 @@ else:
 
 toto_strategy = generate_toto_recommendations(matches, current_weights, num_doubles)
 
-# === היסטוריית טפסים ===
-st.sidebar.markdown("---")
-st.sidebar.markdown("### 📋 טפסים ששלחתי")
-
-if os.path.exists(DB_PATH):
-    try:
-        _conn = sqlite3.connect(DB_PATH)
-        _slips = pd.read_sql_query(
-            "SELECT id, created_at, bet_type, total_stake, potential_return, settled, result_profit "
-            "FROM bet_slips ORDER BY id DESC LIMIT 10", _conn)
-        _legs_all = pd.read_sql_query("SELECT slip_id, home_team, away_team, selection, odds, match_date FROM bet_slip_legs", _conn)
-        _results = pd.read_sql_query(
-            "SELECT home_team, away_team, match_date, actual_result, home_goals, away_goals FROM matches "
-            "WHERE actual_result IS NOT NULL AND actual_result != '' AND actual_result != 'None'", _conn)
-        _conn.close()
-
-        if _slips.empty:
-            st.sidebar.info("טרם נשלחו טפסים.")
-        else:
-            for _, slip in _slips.iterrows():
-                sid = int(slip['id'])
-                date_str = str(slip['created_at'])[:10]
-                settled = int(slip['settled'])
-                profit = float(slip['result_profit'])
-                stake = float(slip['total_stake'])
-
-                legs = _legs_all[_legs_all['slip_id'] == sid]
-                leg_results = []
-                for _, leg in legs.iterrows():
-                    hm, aw = leg['home_team'], leg['away_team']
-                    md = leg.get('match_date')
-                    if md and str(md).strip():
-                        date_str_leg = str(md).strip()[:10]
-                        res_row = _results[
-                            (_results['home_team'] == hm) & (_results['away_team'] == aw)
-                            & (_results['match_date'].astype(str).str[:10] == date_str_leg)
-                        ]
-                    else:
-                        res_row = _results[(_results['home_team'] == hm) & (_results['away_team'] == aw)]
-                    if res_row.empty:
-                        leg_results.append(None)
-                    else:
-                        rr = res_row.iloc[0]
-                        leg_results.append(
-                            resolve_bet_leg_win(
-                                leg["selection"],
-                                rr["actual_result"],
-                                rr.get("home_goals"),
-                                rr.get("away_goals"),
-                            )
-                        )
-                alive_dead = _slip_alive_or_dead(slip['bet_type'], leg_results)
-
-                if settled:
-                    if profit > 0:
-                        slip_icon = "✅"
-                        slip_color = "#dcfce7"
-                        profit_str = f"+₪{profit:.0f}"
-                        status_txt = f"סגור · {alive_dead} · זכה"
-                    elif profit == 0:
-                        slip_icon = "🔄"
-                        slip_color = "#fef9c3"
-                        profit_str = "±0"
-                        status_txt = f"סגור · {alive_dead} · תיקו"
-                    else:
-                        slip_icon = "❌"
-                        slip_color = "#fee2e2"
-                        profit_str = f"-₪{abs(profit):.0f}"
-                        status_txt = f"סגור · {alive_dead} · נכשל"
-                    header = f"{slip_icon} טופס {sid} | {date_str} | {status_txt} {profit_str}"
-                else:
-                    slip_icon = "⏳"
-                    slip_color = "#f0f9ff"
-                    header = f"⏳ טופס {sid} | {date_str} | פתוח · {alive_dead} · עלות ₪{stake:.0f}"
-
-                with st.sidebar.expander(header, expanded=(sid == int(_slips.iloc[0]['id']))):
-                    st.markdown(
-                        f"<div style='font-size:0.8rem; color:#6b7280;'>"
-                        f"סוג: {slip['bet_type']} | עלות: ₪{stake:.0f} | פוטנציאל: ₪{slip['potential_return']:.0f}"
-                        f"</div>", unsafe_allow_html=True)
-                    if st.button("🗑️ מחק טופס", key=f"del_slip_{sid}", type="secondary"):
-                        delete_slip(sid)
-                        st.rerun()
-                    legs = _legs_all[_legs_all['slip_id'] == sid]
-                    for _, leg in legs.iterrows():
-                        hm, aw = leg['home_team'], leg['away_team']
-                        md = leg.get('match_date')
-                        if md and str(md).strip():
-                            date_str = str(md).strip()[:10]
-                            res_row = _results[
-                                (_results['home_team'] == hm) & (_results['away_team'] == aw)
-                                & (_results['match_date'].astype(str).str[:10] == date_str)
-                            ]
-                        else:
-                            res_row = _results[(_results['home_team'] == hm) & (_results['away_team'] == aw)]
-                        if not res_row.empty:
-                            rr = res_row.iloc[0]
-                            actual = str(rr["actual_result"]).strip()
-                            w = resolve_bet_leg_win(
-                                leg["selection"], rr["actual_result"], rr.get("home_goals"), rr.get("away_goals")
-                            )
-                            if w is None:
-                                hit = "⏳"
-                                result_txt = f"תוצאה: **{actual}** · ממתין לשערים לסילוק שוק"
-                            else:
-                                hit = "✅" if w else "❌"
-                                goals_note = ""
-                                hi = _goal_int(rr.get("home_goals"))
-                                ai = _goal_int(rr.get("away_goals"))
-                                if hi is not None and ai is not None:
-                                    goals_note = f" · שערים {hi}–{ai}"
-                                result_txt = f"תוצאה: **{actual}**{goals_note} {hit}"
-                        else:
-                            result_txt = "⏳ ממתין"
-                        st.markdown(
-                            f"<div style='font-size:0.78rem; border-right:3px solid #94a3b8; "
-                            f"padding:4px 6px; margin:3px 0; background:{slip_color}; border-radius:4px;'>"
-                            f"<b>{leg['home_team']} - {leg['away_team']}</b><br>"
-                            f"הימור: <b>{leg['selection']}</b> @ {leg['odds']:.2f} | {result_txt}"
-                            f"</div>", unsafe_allow_html=True)
-    except Exception as _ex:
-        st.sidebar.warning(f"שגיאה בטעינת טפסים: {_ex}")
-else:
-    st.sidebar.info("מסד הנתונים לא נמצא.")
 
 # --- Main Dashboard Layout ---
 try:
