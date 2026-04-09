@@ -8,3 +8,4 @@ python-dateutil>=2.8
 plotly>=5.0
 rapidfuzz>=3.0
 scikit-learn>=1.0
+playwright>=1.40

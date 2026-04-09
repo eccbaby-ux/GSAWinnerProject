@@ -25,7 +25,9 @@ jobs:
           cache: 'pip'
 
       - name: Install dependencies
-        run: pip install -r requirements.txt
+        run: |
+          pip install -r requirements.txt
+          python -m playwright install chromium --with-deps
 
       - name: Train Pipeline (למידה מתוצאות אתמול)
         env:
