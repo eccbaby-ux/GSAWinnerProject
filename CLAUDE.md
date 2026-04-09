@@ -2,12 +2,53 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+---
+
+## ☁️ סטטוס פריסה (עדכני: אפריל 2026)
+
+### GitHub
+- **ריפו:** `https://github.com/eccbaby-ux/GSAWinnerProject` (Public)
+- **ענף ראשי:** `main`
+- כל push לענף `main` מעורר רה-דפלוי אוטומטי של Streamlit
+
+### Streamlit Community Cloud (דשבורד)
+- **URL:** `https://gsawinnerproject-tfbemc4a2urnxtecrjjeks.streamlit.app`
+- **קובץ ראשי:** `deshbord giboi.py`
+- גישה מסמארטפון — עובד דרך הקישור לעיל
+- מתרענן אוטומטית כל פעם שה-GitHub Actions דוחף commit חדש
+
+### GitHub Actions (אוטומציה יומית)
+- **קובץ:** `.github/workflows/daily_pipeline.yml`
+- **זמן הרצה:** כל יום ב-06:00 UTC = 09:00 שעון ישראל (קיץ)
+- **סדר הרצה:**
+  1. `Train_GSA` — שולף תוצאות, מעדכן ELO, משקולות, שישקה, טיכה
+  2. `Run_GSA` — שולף מכרז Winner, מחשב תחזיות, סינון סיכונים
+- אחרי כל ריצה — ה-workflow דוחף בחזרה לריפו: `gsa_history.db`, `analysis_results_v76.json`, JSON-ים נוספים
+- **הפעלה ידנית:** GitHub → Actions → Daily GSA Pipeline → Run workflow
+
+### Secret נדרש בגיטהאב
+- `FOOTBALL_API_KEY` = המפתח של API-Sports
+- מוגדר ב: `https://github.com/eccbaby-ux/GSAWinnerProject/settings/secrets/actions`
+
+---
+
+## ⚠️ בעיות פתוחות / דברים לבדוק
+
+1. **Playwright ב-GitHub Actions** — `winner_auto_fetcher.py` משתמש ב-Playwright לגרידת Winner.
+   - נוסף ל-`requirements.txt`: `playwright>=1.40`
+   - נוסף ל-workflow: `python -m playwright install chromium --with-deps`
+   - ייתכן שאתר Winner חוסם requests מ-IP של GitHub Actions — יש לבדוק logs
+
+2. **gsa_history.db בגיטהאב** — קובץ בינארי שגדל עם הזמן. אם יגיע ל-~90MB יש לעבור ל-Git LFS.
+
+---
+
 ## Commands
 
 ```bat
 Run_GSA.bat          # Generate today's predictions (fetch odds → predict → risk filter)
 Train_GSA.bat        # Train/learn from completed matches (results → ELO → weights → Shishka → Ticha)
-Run_Dashboard.bat    # Launch Streamlit dashboard (streamlit run "deshbord giboi.py")
+Run_Dashboard.bat    # Launch Streamlit dashboard locally (streamlit run "deshbord giboi.py")
 ```
 
 Run individual steps manually:
@@ -21,6 +62,8 @@ python -Xutf8 v79_Auto_Learner.py      # Optimize model/market weights by ROI
 python -Xutf8 shishka_run_and_save.py  # Run data-quality validation gate
 python -Xutf8 ticha_system.py          # Backward-learning weight refinement
 ```
+
+---
 
 ## Architecture
 
@@ -81,7 +124,7 @@ Applied in two layers:
 ### Key Config (v76_Master_Nachshon.py)
 
 ```python
-FOOTBALL_API_KEY = "e49cdc2ba079c654d1dbc88fb16bfa75"  # API-Sports key
+FOOTBALL_API_KEY = os.environ.get("FOOTBALL_API_KEY", "...")  # מגיע מ-GitHub Secret
 HOME_ADVANTAGE_FACTOR = 1.12
 AWAY_DISADVANTAGE_FACTOR = 0.88
 DIXON_COLES_RHO = 0.12
@@ -98,6 +141,14 @@ DIXON_COLES_RHO = 0.12
 | `translation_cache.json` | Cached Hebrew→English translations |
 | `ticha_params.json` | Ticha neural net weights (W, b) backup |
 | `calibration_params.json` | Platt Scaling calibration params backup |
+| `.github/workflows/daily_pipeline.yml` | GitHub Actions — ריצה יומית אוטומטית |
+
+### Path Convention (חשוב!)
+כל הקבצים משתמשים ב:
+```python
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+```
+**לא** נתיבים מוחלטים — הפרויקט עובד מכל תיקייה.
 
 ### Known Limitations
 
