@@ -50,40 +50,49 @@ st.markdown("""
 
     /* --- Mobile Responsive --- */
     @media (max-width: 768px) {
-        /* עמודות מתקפלות לשורות נפרדות */
-        [data-testid="column"] {
+        /* הורדת ריווח כללי */
+        .block-container {
+            padding-left: 0.5rem !important;
+            padding-right: 0.5rem !important;
+            padding-top: 0.5rem !important;
+        }
+        /* עמודות Streamlit — הורדת flex לשורה אחת */
+        [data-testid="stHorizontalBlock"] {
+            flex-wrap: wrap !important;
+        }
+        [data-testid="stHorizontalBlock"] > div[data-testid="column"] {
+            flex: 0 0 100% !important;
             width: 100% !important;
-            flex: 1 1 100% !important;
             min-width: 100% !important;
+            max-width: 100% !important;
         }
-        /* מדדים (metrics) בגופן קריא */
-        [data-testid="stMetric"] {
-            font-size: 0.9rem !important;
-        }
-        /* טקסט כותרות */
-        h1 { font-size: 1.4rem !important; }
-        h2 { font-size: 1.2rem !important; }
-        h3 { font-size: 1.0rem !important; }
+        /* כותרות */
+        h1 { font-size: 1.2rem !important; }
+        h2 { font-size: 1.0rem !important; }
+        h3 { font-size: 0.9rem !important; }
         /* טבלאות גלילה אופקית */
-        [data-testid="stDataFrame"], .stTable {
+        [data-testid="stDataFrame"] > div {
             overflow-x: auto !important;
-            display: block !important;
         }
-        /* כפתורים בגודל נוח לאצבע */
+        /* כפתורים */
         .stButton > button {
             width: 100% !important;
-            min-height: 2.5rem !important;
-            font-size: 1rem !important;
+            min-height: 2.8rem !important;
+            font-size: 0.95rem !important;
+            margin-bottom: 4px !important;
         }
-        /* סרגל צד — רוחב מלא במובייל */
+        /* מדדים */
+        [data-testid="stMetric"] {
+            padding: 8px !important;
+        }
+        /* tabs */
+        [data-testid="stTabs"] button {
+            font-size: 0.78rem !important;
+            padding: 5px 6px !important;
+        }
+        /* סרגל צד */
         section[data-testid="stSidebar"] {
             width: 85vw !important;
-            min-width: 0 !important;
-        }
-        /* ריווח מופחת */
-        .block-container {
-            padding-left: 0.75rem !important;
-            padding-right: 0.75rem !important;
         }
     }
 </style>
@@ -3001,37 +3010,34 @@ st.sidebar.markdown(
     "הפעלת ציד יומי או למידה וכיול</div>",
     unsafe_allow_html=True,
 )
-col_run, col_train = st.sidebar.columns(2)
-with col_run:
-    st.caption(f"🕐 {_maint_rec['run_caption']}")
-    if st.button("🚀 הרץ ציד יומי (Run_GSA.bat)", key="btn_run_gsa", help="Run_GSA.bat"):
-        with st.spinner("מריץ Run_GSA.bat..."):
-            with bat_output_placeholder.container():
-                with st.expander("📋 פלט מסוף (אזור רחב)", expanded=True):
-                    output_block = st.empty()
-                    ok, output = run_bat_and_capture_output(RUN_GSA_BAT, output_block)
-                    output_block.code(output, language="text")
-        if ok:
-            st.success("הציד היומי הושלם בהצלחה!")
-            time.sleep(1)
-            st.rerun()
-        else:
-            st.error("הציד היומי נכשל. בדוק את הפלט למעלה.")
-with col_train:
-    st.caption(f"🕐 {_maint_rec['train_caption']}")
-    if st.button("🧠 הרץ למידה וכיול (Train_GSA.bat)", key="btn_train_gsa", help="Train_GSA.bat"):
-        with st.spinner("מריץ Train_GSA.bat..."):
-            with bat_output_placeholder.container():
-                with st.expander("📋 פלט מסוף (אזור רחב)", expanded=True):
-                    output_block = st.empty()
-                    ok, output = run_bat_and_capture_output(TRAIN_GSA_BAT, output_block)
-                    output_block.code(output, language="text")
-        if ok:
-            st.success("למידה וכיול הושלמו בהצלחה!")
-            time.sleep(1)
-            st.rerun()
-        else:
-            st.error("למידה וכיול נכשלו. בדוק את הפלט למעלה.")
+st.sidebar.caption(f"🕐 {_maint_rec['run_caption']}")
+if st.sidebar.button("🚀 הרץ ציד יומי (Run_GSA)", key="btn_run_gsa", help="Run_GSA.bat", use_container_width=True):
+    with st.spinner("מריץ Run_GSA.bat..."):
+        with bat_output_placeholder.container():
+            with st.expander("📋 פלט מסוף (אזור רחב)", expanded=True):
+                output_block = st.empty()
+                ok, output = run_bat_and_capture_output(RUN_GSA_BAT, output_block)
+                output_block.code(output, language="text")
+    if ok:
+        st.success("הציד היומי הושלם בהצלחה!")
+        time.sleep(1)
+        st.rerun()
+    else:
+        st.error("הציד היומי נכשל. בדוק את הפלט למעלה.")
+st.sidebar.caption(f"🕐 {_maint_rec['train_caption']}")
+if st.sidebar.button("🧠 הרץ למידה וכיול (Train_GSA)", key="btn_train_gsa", help="Train_GSA.bat", use_container_width=True):
+    with st.spinner("מריץ Train_GSA.bat..."):
+        with bat_output_placeholder.container():
+            with st.expander("📋 פלט מסוף (אזור רחב)", expanded=True):
+                output_block = st.empty()
+                ok, output = run_bat_and_capture_output(TRAIN_GSA_BAT, output_block)
+                output_block.code(output, language="text")
+    if ok:
+        st.success("למידה וכיול הושלמו בהצלחה!")
+        time.sleep(1)
+        st.rerun()
+    else:
+        st.error("למידה וכיול נכשלו. בדוק את הפלט למעלה.")
 
 st.sidebar.markdown("---")
 
@@ -3204,81 +3210,61 @@ st.markdown(
 
 # --- סיכום כספי: 5 כרטיסים + כפתורי פעולה ---
 fin = get_dashboard_finance_stats()
-fc1, fc2, fc3, fc4, fc5 = st.columns(5)
-with fc1:
-    st.markdown(
-        f"<div class='finance-card'>"
-        f"<div class='card-title'>🧮 קופה</div>"
-        f"<div class='card-value' style='color:#22c55e;'>₪{fin['bankroll']:,.0f}</div>"
-        f"</div>",
-        unsafe_allow_html=True,
-    )
-with fc2:
-    sub = f"<div class='card-sub'>תלוי ₪{fin['pending_amount']:,.0f}</div>" if fin["pending_amount"] > 0 else ""
-    st.markdown(
-        f"<div class='finance-card'>"
-        f"<div class='card-title'>🌱 סה\"כ הומר</div>"
-        f"<div class='card-value' style='color:#22c55e;'>₪{fin['total_invested']:,.0f}</div>"
-        f"{sub}"
-        f"</div>",
-        unsafe_allow_html=True,
-    )
-with fc3:
-    clr = "#22c55e" if fin["net_profit"] >= 0 else "#dc2626"
-    sub = f"<div class='card-sub'>ROI: {fin['roi_pct']:.1f}%</div>" if fin["total_invested"] > 0 else ""
-    st.markdown(
-        f"<div class='finance-card'>"
-        f"<div class='card-title'>📈 רווח/הפסד נטו</div>"
-        f"<div class='card-value' style='color:{clr};'>{fin['net_profit']:+.0f}₪</div>"
-        f"{sub}"
-        f"</div>",
-        unsafe_allow_html=True,
-    )
-with fc4:
-    clr = "#22c55e" if fin["win_pct"] >= 50 else "#f97316"
-    sub = f"<div class='card-sub'>✅ {fin['wins']} &nbsp; ❌ {fin['losses']} &nbsp; ⏳ {fin['pending_count']}</div>"
-    st.markdown(
-        f"<div class='finance-card'>"
-        f"<div class='card-title'>🎯 אחוז זכייה</div>"
-        f"<div class='card-value' style='color:{clr};'>{fin['win_pct']:.0f}%</div>"
-        f"{sub}"
-        f"</div>",
-        unsafe_allow_html=True,
-    )
-with fc5:
-    st.markdown(
-        f"<div class='finance-card'>"
-        f"<div class='card-title'>⚡ רצף נוכחי</div>"
-        f"<div class='card-value' style='color:#374151;'>{fin['current_streak']}</div>"
-        f"</div>",
-        unsafe_allow_html=True,
-    )
+_fin_clr_profit = "#22c55e" if fin["net_profit"] >= 0 else "#dc2626"
+_fin_clr_win = "#22c55e" if fin["win_pct"] >= 50 else "#f97316"
+_fin_sub_invested = f"<div class='card-sub'>תלוי ₪{fin['pending_amount']:,.0f}</div>" if fin["pending_amount"] > 0 else ""
+_fin_sub_profit = f"<div class='card-sub'>ROI: {fin['roi_pct']:.1f}%</div>" if fin["total_invested"] > 0 else ""
+_fin_sub_win = f"<div class='card-sub'>✅ {fin['wins']} &nbsp; ❌ {fin['losses']} &nbsp; ⏳ {fin['pending_count']}</div>"
+st.markdown(f"""
+<div style='display:grid; grid-template-columns: repeat(3,1fr); gap:8px; margin-bottom:12px;
+            grid-template-columns: repeat(auto-fit, minmax(140px,1fr));'>
+    <div class='finance-card'>
+        <div class='card-title'>🧮 קופה</div>
+        <div class='card-value' style='color:#22c55e;'>₪{fin['bankroll']:,.0f}</div>
+    </div>
+    <div class='finance-card'>
+        <div class='card-title'>🌱 סה"כ הומר</div>
+        <div class='card-value' style='color:#22c55e;'>₪{fin['total_invested']:,.0f}</div>
+        {_fin_sub_invested}
+    </div>
+    <div class='finance-card'>
+        <div class='card-title'>📈 רווח/הפסד</div>
+        <div class='card-value' style='color:{_fin_clr_profit};'>{fin['net_profit']:+.0f}₪</div>
+        {_fin_sub_profit}
+    </div>
+    <div class='finance-card'>
+        <div class='card-title'>🎯 אחוז זכייה</div>
+        <div class='card-value' style='color:{_fin_clr_win};'>{fin['win_pct']:.0f}%</div>
+        {_fin_sub_win}
+    </div>
+    <div class='finance-card'>
+        <div class='card-title'>⚡ רצף נוכחי</div>
+        <div class='card-value' style='color:#374151;'>{fin['current_streak']}</div>
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
-btn_col1, btn_col2, _ = st.columns([1, 1, 2])
-with btn_col1:
-    if st.button("🔍 בדוק ועדכן קופה לפי תוצאות חדשות", type="primary", key="btn_check_results"):
-        settle_open_slips()
-        st.success("הקופה עודכנה לפי טפסים שהסתיימו (אם היו כאלה). מרענן...")
+if st.button("🔍 בדוק ועדכן קופה לפי תוצאות חדשות", type="primary", key="btn_check_results", use_container_width=True):
+    settle_open_slips()
+    st.success("הקופה עודכנה לפי טפסים שהסתיימו (אם היו כאלה). מרענן...")
+    st.rerun()
+with st.expander("✏️ עדכן קופה", expanded=False):
+    new_balance = st.number_input("יתרה חדשה (₪)", min_value=0.0, value=float(fin["bankroll"]), step=50.0, key="new_bankroll_input")
+    if st.button("שמור יתרה", key="btn_save_bankroll"):
+        set_bankroll_balance(new_balance)
+        st.success("הקופה עודכנה.")
         st.rerun()
-with btn_col2:
-    with st.expander("✏️ עדכן קופה", expanded=False):
-        new_balance = st.number_input("יתרה חדשה (₪)", min_value=0.0, value=float(fin["bankroll"]), step=50.0, key="new_bankroll_input")
-        if st.button("שמור יתרה", key="btn_save_bankroll"):
-            set_bankroll_balance(new_balance)
-            st.success("הקופה עודכנה.")
-            st.rerun()
 st.markdown("<br>", unsafe_allow_html=True)
 
-c_acc, c_total, c_w1, c_w2 = st.columns(4)
-with c_acc:
-    clr = "#22c55e" if stats['hit_rate'] >= 50 else "#f97316"
-    st.markdown(f"<div class='metric-container'><small>דיוק מערכת</small><b style='color:{clr};'>{stats['hit_rate']:.1f}%</b></div>", unsafe_allow_html=True)
-with c_total:
-    st.markdown(f"<div class='metric-container'><small>משחקים בזיכרון</small><b>{stats['total']}</b></div>", unsafe_allow_html=True)
-with c_w1:
-    st.markdown(f"<div class='metric-container'><small>משקל מודל מתמטי</small><b style='color:#1565c0;'>{current_weights[0]:.0%}</b></div>", unsafe_allow_html=True)
-with c_w2:
-    st.markdown(f"<div class='metric-container'><small>משקל שוק (ווינר)</small><b style='color:#059669;'>{current_weights[1]:.0%}</b></div>", unsafe_allow_html=True)
+_m_clr_acc = "#22c55e" if stats['hit_rate'] >= 50 else "#f97316"
+st.markdown(f"""
+<div style='display:grid; grid-template-columns: repeat(auto-fit, minmax(130px,1fr)); gap:8px; margin-bottom:8px;'>
+    <div class='metric-container'><small>דיוק מערכת</small><b style='color:{_m_clr_acc};'>{stats['hit_rate']:.1f}%</b></div>
+    <div class='metric-container'><small>משחקים בזיכרון</small><b>{stats['total']}</b></div>
+    <div class='metric-container'><small>משקל מודל</small><b style='color:#1565c0;'>{current_weights[0]:.0%}</b></div>
+    <div class='metric-container'><small>משקל שוק</small><b style='color:#059669;'>{current_weights[1]:.0%}</b></div>
+</div>
+""", unsafe_allow_html=True)
 st.markdown("<br>", unsafe_allow_html=True)
 
 # המלצת מערכת לכיול משקולות – מבוסס היסטוריה + ROI קופה
