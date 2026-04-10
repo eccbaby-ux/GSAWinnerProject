@@ -93,10 +93,10 @@ git add gsa_history.db analysis_results_v76.json winner_odds_cache.json ^
         winner_odds_previous.json ticha_params.json calibration_params.json ^
         translation_cache.json matches.txt
 git diff --cached --quiet
-if %errorlevel% neq 0 (
+if !errorlevel! neq 0 (
     git commit -m "auto: daily pipeline %date% %time:~0,5%"
     git push
-    if %errorlevel% neq 0 (
+    if !errorlevel! neq 0 (
         echo [ERROR] git push failed - check connection/credentials.
         pause
         exit /b 1
